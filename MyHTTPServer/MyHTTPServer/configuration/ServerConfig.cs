@@ -9,17 +9,26 @@ namespace MyHTTPServer.configuration
 {
     public class ServerConfig
     {
-        public AppSettingConfig configInfo { get; }
+        private static AppSettingConfig? ConfigInfo { get; set; }
+        private static readonly string configPath = @"configuration/appsetting.json";
 
-        public ServerConfig(string configPath)
+        private ServerConfig()
         {
             if (!File.Exists(configPath))
                 throw new Exception();
 
             using (var jsonConfig = File.OpenRead(configPath))
             {
-                configInfo = JsonSerializer.Deserialize<AppSettingConfig>(jsonConfig);
+                ConfigInfo = JsonSerializer.Deserialize<AppSettingConfig>(jsonConfig);
             }
+        }
+
+        public static AppSettingConfig GetConfig()
+        {
+            if (ConfigInfo == null)
+                new ServerConfig();
+
+            return ConfigInfo;
         }
     }
 }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace MyHTTPServer.configuration
@@ -16,6 +17,5 @@ namespace MyHTTPServer.configuration
         public string PasswordSender { get; set; }
         public string SMTPServerHost { get; set; }
         public ushort SMTPServerPort { get; set; }
-
     }
 }

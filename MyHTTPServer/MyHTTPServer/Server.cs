@@ -12,18 +12,16 @@ namespace MyHTTPServer
 {
     public class Server
     {
-        private static readonly string configPath = @"configuration/appsetting.json";
-
         private HttpListener _listener;
-        private ServerConfig _serverConfig;
+        private static AppSettingConfig _serverConfig;
         private static bool _isStop = true; 
         private static CancellationTokenSource _cts;
 
         public Server()
         {
-            _serverConfig = new ServerConfig(configPath);
+            _serverConfig = ServerConfig.GetConfig();
             _listener = new HttpListener();
-            _listener.Prefixes.Add($"{_serverConfig.configInfo.Address}:{_serverConfig.configInfo.Port}/");
+            _listener.Prefixes.Add($"{_serverConfig.Address}:{_serverConfig.Port}/");
             _cts = new CancellationTokenSource();
         }
 
@@ -53,7 +51,7 @@ namespace MyHTTPServer
             {  
                 _listener.Start();
                 await Console.Out.WriteLineAsync("Сервер запущен");
-                var staticFilesHandler = new StaticFilesHandler(_serverConfig);
+                var staticFilesHandler = new StaticFilesHandler();
                 var emailSender = new EmailSenderService();
 
                 while (!_token.IsCancellationRequested)

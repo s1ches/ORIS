@@ -14,20 +14,14 @@ namespace MyHTTPServer
 {
     public class EmailSenderService : IEmailSenderService
     {
-        private static readonly string configPath = @"configuration/appsetting.json";
-        private static readonly string pathToZip = @"../../../zip.zip";
-        private ServerConfig serverConfig;
-
-        public EmailSenderService()
-        {
-            serverConfig = new ServerConfig(configPath);
-        }
+        private static readonly string _pathToZip = @"../../../zip.zip";
+        private static readonly AppSettingConfig _serverConfig = ServerConfig.GetConfig();
 
         public async Task SendEmailAsync(string toEmail, string subject, string message)
         {
             using var emailMessage = new MimeMessage();
-
-            emailMessage.From.Add(new MailboxAddress(serverConfig.configInfo.FromName, serverConfig.configInfo.EmailSender));
+            
+            emailMessage.From.Add(new MailboxAddress(_serverConfig.FromName, _serverConfig.EmailSender));
             emailMessage.To.Add(new MailboxAddress("", toEmail));
 
             emailMessage.Subject = subject;
@@ -35,7 +29,7 @@ namespace MyHTTPServer
 
             var attachment = new MimePart("application/zip")
             {
-                Content = new MimeContent(File.OpenRead(pathToZip)),
+                Content = new MimeContent(File.OpenRead(_pathToZip)),
                 ContentDisposition = new ContentDisposition(ContentDisposition.Attachment),
                 ContentTransferEncoding = ContentEncoding.Base64,
                 FileName = Path.GetFileName("HWzip")
@@ -49,8 +43,8 @@ namespace MyHTTPServer
 
             using (var client = new SmtpClient())
             {
-                await client.ConnectAsync(serverConfig.configInfo.SMTPServerHost, serverConfig.configInfo.SMTPServerPort, true);
-                await client.AuthenticateAsync(serverConfig.configInfo.EmailSender, serverConfig.configInfo.PasswordSender);
+                await client.ConnectAsync(_serverConfig.SMTPServerHost, _serverConfig.SMTPServerPort, true);
+                await client.AuthenticateAsync(_serverConfig.EmailSender, _serverConfig.PasswordSender);
                 await client.SendAsync(emailMessage);
                 await client.DisconnectAsync(true);       
             }

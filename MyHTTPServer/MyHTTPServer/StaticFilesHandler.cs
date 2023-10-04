@@ -12,12 +12,11 @@ namespace MyHTTPServer
 {
     public class StaticFilesHandler : IHandler
     {
-        private ServerConfig _serverConfig;
         private static Dictionary<string, string> MimeTypes;
+        private static readonly AppSettingConfig _serverConfig = ServerConfig.GetConfig();
 
-        public StaticFilesHandler(ServerConfig serverConfig)
+        public StaticFilesHandler()
         {
-            _serverConfig = serverConfig;
             MimeTypes = new Dictionary<string, string>() 
             {
                 {"html", "text/html"},
@@ -35,14 +34,13 @@ namespace MyHTTPServer
             var response = context.Response;
             var request = context.Request;
             var requestUrl = string.Join("", request.RawUrl!.Skip(1).ToArray());
-
-            var path = $@"../../../{_serverConfig.configInfo.StaticFilesPath}/index.html";
-            var staticFilePath = $@"../../../{_serverConfig.configInfo.StaticFilesPath}/{requestUrl}";
+            
+            var path = $@"../../../{_serverConfig.StaticFilesPath}/index.html";
+            var staticFilePath = $@"../../../{_serverConfig.StaticFilesPath}/{requestUrl}";
             
             var isFind = false;
 
             byte[] responseBuffer;
-            Console.WriteLine("");
 
             if ((requestUrl.StartsWith("imgs") || requestUrl.StartsWith("styles")) && File.Exists(staticFilePath))
             {
