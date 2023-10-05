@@ -2,11 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Reflection;
+using System.Reflection.Metadata;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using MyHTTPServer.configuration;
+using MyHTTPServer.handlers;
 
 namespace MyHTTPServer
 {
@@ -15,7 +18,7 @@ namespace MyHTTPServer
         private HttpListener _listener;
         private static AppSettingConfig _serverConfig;
         private static bool _isStop = true; 
-        private static CancellationTokenSource _cts;
+        private CancellationTokenSource _cts;
 
         public Server()
         {
@@ -33,7 +36,9 @@ namespace MyHTTPServer
                 _isStop = await IsStop();
 
             _cts.Cancel();
-
+            
+            serverListeningTask.Dispose();
+            
             if (_listener.IsListening)
             {
                 await Console.Out.WriteLineAsync("Сервер остановлен");
@@ -51,24 +56,26 @@ namespace MyHTTPServer
             {  
                 _listener.Start();
                 await Console.Out.WriteLineAsync("Сервер запущен");
-                var staticFilesHandler = new StaticFilesHandler();
-                var emailSender = new EmailSenderService();
+                
+                Handler staticFilesHandler = new StaticFilesHandler();
+                Handler controllerHandler = new ControllerHandler();
+                staticFilesHandler.Successor = controllerHandler;
 
                 while (!_token.IsCancellationRequested)
                 {
                     var context = await _listener.GetContextAsync();
-                    
-                    if (context.Request.HttpMethod.ToLower().Equals("get"))
-                        await staticFilesHandler.Handle(context);
-                    else if (context.Request.HttpMethod.ToLower().Equals("post"))
-                    {
-                        string message = CreateEmailFormMessage(context.Request).Result;
-                        await emailSender.SendEmailAsync("1chessmic@gmail.com", "hw", message);
-                        //await emailSender.SendEmailAsync("t.mukhutdinov.job@gmail.com", "HW", message);
-                        context.Response.Redirect(_listener.Prefixes.First());
-                        context.Response.Close();
-                        await Task.Delay(1000);
-                    }
+                    staticFilesHandler.HandleRequest(context);
+                    // if (context.Request.HttpMethod.ToLower().Equals("get"))
+                    //     staticFilesHandler.HandleRequest(context);
+                    // else if (context.Request.HttpMethod.ToLower().Equals("post"))
+                    // {
+                    //     string message = CreateEmailFormMessage(context.Request).Result;
+                    //     await emailSender.SendEmailAsync("1chessmic@gmail.com", "hw", message);
+                    //     //await emailSender.SendEmailAsync("t.mukhutdinov.job@gmail.com", "HW", message);
+                    //     context.Response.Redirect(_listener.Prefixes.First());
+                    //     context.Response.Close();
+                    //     await Task.Delay(1000);
+                    // }
                 }
             }
             catch (Exception ex) { /*await Console.Out.WriteLineAsync(ex.Message);*/ }
