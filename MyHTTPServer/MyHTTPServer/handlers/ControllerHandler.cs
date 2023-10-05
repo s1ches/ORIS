@@ -5,35 +5,34 @@ namespace MyHTTPServer.handlers;
 
 public class ControllerHandler : Handler
 {
-    private readonly Assembly _controllerAssembly;
-    public static Dictionary<string, Action<HttpListenerContext>> Actions { get; private set; }
-
-    public ControllerHandler()
-    {
-        _controllerAssembly = Assembly.GetEntryAssembly();
-        
-        Actions = _controllerAssembly.GetTypes()
-            .Where(x => typeof(Handler).IsAssignableFrom(x))
-            .SelectMany(Handler => Handler.GetMethods()
-                .Select(Method => new { Handler, Method }))
-            .ToDictionary(
-                key => GetPath(key.Handler, key.Method),
-                value => GetEndpointMethod(value.Handler, value.Method)
-                );
-    }
+    private static Assembly _controllerAssembly;
     
     public override void HandleRequest(HttpListenerContext context)
     {
-        throw new NotImplementedException();
-    }
+        var strParams = context.Request.Url
+            .Segments
+            .Skip(1)
+            .Select(s => s.Replace("/", ""))
+            .ToArray();
 
-    private string GetPath(Type handler, MethodInfo method)
-    {
-        throw new NotImplementedException();
-    }
+        var controllerName = strParams[0];
 
-    private Action<HttpListenerContext> GetEndpointMethod(Type handler, MethodInfo method)
-    {
-        throw new NotImplementedException();
+        _controllerAssembly = Assembly.GetEntryAssembly();
+        
+        var controller = _controllerAssembly.GetTypes()
+            .Where(t => Attribute.IsDefined(t, typeof(HttpController)))
+            .FirstOrDefault(c => (((HttpController)Attribute.GetCustomAttribute(c, typeof(HttpController))!)!)
+                .ControllerName.Equals(controllerName+"controller", StringComparison.OrdinalIgnoreCase));
+        
+        if(controller==null) throw new Exception("null controller");
+        
+        var methodName = strParams[1];
+        
+        var method = controller.GetMethods()
+            .FirstOrDefault(t => t.Name.Equals(methodName, StringComparison.OrdinalIgnoreCase));
+
+        if (method == null) throw new Exception("null method");
+        
+        var ret = method.Invoke(Activator.CreateInstance(controller), new object[] {context});
     }
 }

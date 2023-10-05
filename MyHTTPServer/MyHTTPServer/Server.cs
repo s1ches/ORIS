@@ -37,8 +37,6 @@ namespace MyHTTPServer
 
             _cts.Cancel();
             
-            serverListeningTask.Dispose();
-            
             if (_listener.IsListening)
             {
                 await Console.Out.WriteLineAsync("Сервер остановлен");
@@ -65,37 +63,11 @@ namespace MyHTTPServer
                 {
                     var context = await _listener.GetContextAsync();
                     staticFilesHandler.HandleRequest(context);
-                    // if (context.Request.HttpMethod.ToLower().Equals("get"))
-                    //     staticFilesHandler.HandleRequest(context);
-                    // else if (context.Request.HttpMethod.ToLower().Equals("post"))
-                    // {
-                    //     string message = CreateEmailFormMessage(context.Request).Result;
-                    //     await emailSender.SendEmailAsync("1chessmic@gmail.com", "hw", message);
-                    //     //await emailSender.SendEmailAsync("t.mukhutdinov.job@gmail.com", "HW", message);
-                    //     context.Response.Redirect(_listener.Prefixes.First());
-                    //     context.Response.Close();
-                    //     await Task.Delay(1000);
-                    // }
                 }
             }
             catch (Exception ex) { /*await Console.Out.WriteLineAsync(ex.Message);*/ }
         }
 
         private async Task<bool> IsStop() =>  Console.ReadLine().ToLower().Equals("stop");
-
-        private async Task<string> CreateEmailFormMessage(HttpListenerRequest request)
-        {
-            if (!request.HasEntityBody)
-                return default(string);
-
-            var stream = new StreamReader(request.InputStream);
-            var str = await stream.ReadToEndAsync();
-            str = Uri.UnescapeDataString(Regex.Unescape(str));
-            str = str.Replace("&", "\n");
-            str = str.Replace("=", ": ");
-            str = str.Replace("+", " ");
-
-            return str;
-        }
     }
 }

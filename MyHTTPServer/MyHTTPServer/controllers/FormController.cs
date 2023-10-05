@@ -1,17 +1,22 @@
 using System.Net;
 using System.Text.RegularExpressions;
+using MyHTTPServer.configuration;
 
 namespace MyHTTPServer.handlers;
 
-public class AccountHandler : Handler
+[HttpController("FormController")]
+public class FormController
 {
-    async public override void HandleRequest(HttpListenerContext context)
+    async public void SendForm(HttpListenerContext context)
     {
         var emailSender = new EmailSenderService();
         var toEmail = "1chessmic@gmail.com";
         var subject = "hw";
         var message = CreateEmailFormMessage(context.Request).Result;
         await emailSender.SendEmailAsync(toEmail, subject, message);
+        context.Response.Redirect($"{ServerConfig.GetConfig().Address}:{ServerConfig.GetConfig().Port}/");
+        context.Response.Close();
+        await Task.Delay(1000);
     }
     
     private async Task<string> CreateEmailFormMessage(HttpListenerRequest request)
