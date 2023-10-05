@@ -5,7 +5,7 @@ namespace MyHTTPServer.handlers;
 
 public class ControllerHandler : Handler
 {
-    private static Assembly _controllerAssembly;
+    private Assembly _controllerAssembly;
     
     public override void HandleRequest(HttpListenerContext context)
     {
