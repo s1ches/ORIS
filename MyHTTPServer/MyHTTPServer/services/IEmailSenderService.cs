@@ -8,6 +8,7 @@ namespace MyHTTPServer.services
 {
     public interface IEmailSenderService
     {
-        Task SendEmailAsync(string toEmail, string subject, string message);
+        Task SendEmailAsync(string city, string address, string name,
+            string surname, string birthday, string phoneNumber, string email);
     }
 }
