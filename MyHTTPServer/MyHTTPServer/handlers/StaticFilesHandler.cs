@@ -65,6 +65,5 @@ public class StaticFilesHandler : Handler
         }
 
         response.Close();
-        await Console.Out.WriteLineAsync($"Запрос обработан");
     }
 }

@@ -3,6 +3,7 @@ using System.Reflection;
 using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
+using MyHTTPServer.configuration;
 using Org.BouncyCastle.Asn1.Ocsp;
 
 namespace MyHTTPServer.handlers;
@@ -72,7 +73,13 @@ public class ControllerHandler : Handler
             await output.FlushAsync();
             output.Close();
         }
-        
+
+        if(context.Request.HttpMethod.Equals("post", StringComparison.OrdinalIgnoreCase))
+        {
+            var _serverConfig = ServerConfig.GetConfig();
+            response.Redirect($"{_serverConfig.Address}:{_serverConfig.Port}/");
+        }
+        response.Close();
     }
 
     async private Task<string[]> ParseRequest(HttpListenerRequest request)

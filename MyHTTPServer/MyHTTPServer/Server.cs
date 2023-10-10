@@ -63,6 +63,7 @@ namespace MyHTTPServer
                 {
                     var context = await _listener.GetContextAsync();
                     staticFilesHandler.HandleRequest(context);
+                    await Console.Out.WriteLineAsync($"Запрос обработан");
                 }
             }
             catch (Exception ex) { /*await Console.Out.WriteLineAsync(ex.Message);*/ }
