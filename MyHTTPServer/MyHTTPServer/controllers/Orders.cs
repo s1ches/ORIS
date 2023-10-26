@@ -53,7 +53,7 @@ public class Orders
         string htmlCode = "<html><head></html><body style=\"background-color: white;\">";
         foreach (var card in steamCards)
             htmlCode += $"<div style=\"border-color: black;border-width: 2px; display: flex; flex-flow: raw wrap;\">" +
-                        $"<img style=\"display: block;\" src=\"{card.ImagePath}\">" +
+                        $"<img style=\"display: block;\" src={card.ImagePath}>" +
                         $"<span style=\"display: block;\">{card.Title}</span>" +
                         $"<span style=\"display: block;\">{card.Description}</span>" +
                         $"<div style=\"display: flex; flex-flow: raw wrap;\">" +
