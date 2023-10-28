@@ -7,13 +7,12 @@ namespace MyORM;
 
 public class MyDataContext : IDataBaseOperations
 {
-    private NpgsqlConnection _connection;
+    private NpgsqlConnection? _connection;
     private readonly string? _connectionString;
 
     public MyDataContext(string? connectionString)
     {
-        if (connectionString is null)
-            throw new NullReferenceException("connection string is null");
+        if (connectionString is null) throw new NullReferenceException("connection string is null");
         
         _connectionString = connectionString; 
     }
@@ -108,7 +107,7 @@ public class MyDataContext : IDataBaseOperations
         var npsqlExpression = String.Format("SELECT * FROM {0}", tableName);
         var command = new NpgsqlCommand(npsqlExpression, _connection);
 
-        return ExecuteQueryCommand<T>(command)!;
+        return ExecuteQueryCommand<T>(command);
     }
 
     public T? SelectById<T>(int id)
@@ -121,7 +120,7 @@ public class MyDataContext : IDataBaseOperations
         var command = new NpgsqlCommand(npsqlExpression, _connection);
         command.Parameters.Add(idParam);
 
-        return ExecuteQueryCommand<T>(command)!.FirstOrDefault();
+        return ExecuteQueryCommand<T>(command).FirstOrDefault();
     }
     
     private bool ExecuteNonQueryCommand(NpgsqlCommand command, string commandType)
@@ -145,7 +144,7 @@ public class MyDataContext : IDataBaseOperations
         return result > 0;
     }
 
-    private List<T>? ExecuteQueryCommand<T>(NpgsqlCommand command)
+    private List<T> ExecuteQueryCommand<T>(NpgsqlCommand command)
     {
         var result = new List<T>();
         var tableFields = typeof(T)
