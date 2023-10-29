@@ -8,11 +8,11 @@ class Program
 {
     static void Main()
     {
-        var mapper = new ClassWork();
+        var make = new Worker();
         
-        Console.WriteLine(mapper.Ex1("Лейсан"));
-        Console.WriteLine(mapper.Ex2(new StudentEx2{Address = "Ул.Пушкина"}));
-        Console.WriteLine(mapper.Ex3(new StudentEx3()));
+        Console.WriteLine(make.Ex1("Лейсан"));
+        Console.WriteLine(make.Ex2(new StudentEx2{Address = "Ул.Пушкина"}));
+        Console.WriteLine(make.Ex3(new StudentEx3()));
 
         var table = new Table();
         table.Students.Add(new StudentEx4{FIO = "Лейсан Нонская" , Grade = 0});
@@ -20,7 +20,7 @@ class Program
         table.Students.Add(new StudentEx4{FIO = "Иван Сосорин" , Grade = 71});
         table.Students.Add(new StudentEx4{FIO = "Лев Коснырев" , Grade = 56});
 
-        Console.WriteLine(mapper.Ex4(table));
+        Console.WriteLine(make.Ex4(table));
         
     }
 }
