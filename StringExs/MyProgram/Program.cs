@@ -1,5 +1,4 @@
 ﻿using MyProgram.Models;
-using MyTemplates;
 
 
 namespace MyProgram;
@@ -21,6 +20,5 @@ class Program
         table.Students.Add(new StudentEx4{FIO = "Лев Коснырев" , Grade = 56});
 
         Console.WriteLine(make.Ex4(table));
-        
     }
 }

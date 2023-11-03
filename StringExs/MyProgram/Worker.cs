@@ -1,4 +1,7 @@
-﻿namespace MyTemplates;
+﻿using MyTemplates;
+
+namespace MyProgram;
+
 
 public class Worker
 {

@@ -4,50 +4,45 @@ using System.Text.RegularExpressions;
 
 namespace MyTemplates;
 
-static class TemplateStringExtension
+public static class TemplateStringExtension
 {
     public static string Substitute(this string template, object? obj)
     {
+        if (obj is null) throw new ArgumentNullException();
+        
         var result = template;
         
-        if (TemplateRegexes.PropertyTemplateRegex.IsMatch(template))
+        while (TemplateRegexes.PropertyTemplateRegex.IsMatch(result))
             result = result.SubstituteProperty(obj);
 
-        if (TemplateRegexes.FullIfTemplateRegex.IsMatch(template))
+        while (TemplateRegexes.FullIfTemplateRegex.IsMatch(result))
             result = result.SubstituteIfConstruction(obj);
-        
-        if (TemplateRegexes.FullForTemplateRegex.IsMatch(template))
+
+        while (TemplateRegexes.FullForTemplateRegex.IsMatch(result))
             result = result.SubstituteForConstruction(obj);
         
+
         return result;
     }
 
-    public static string SubstituteProperty(this string template, object? obj)
+    private static string SubstituteProperty(this string template, object obj)
     {
-        if (obj is null) throw new NullReferenceException();
-        
         var result = template;
-           
         try
         {
-            while (TemplateRegexes.PropertyTemplateRegex.IsMatch(result))
-            {
-                var propertyTemplate = TemplateRegexes.PropertyTemplateRegex.Match(result).Value;
-                var propertyName = propertyTemplate[2..^1];
-                var propertyValue = obj.GetType().GetProperty(propertyName,
-                    BindingFlags.Instance | BindingFlags.Public | BindingFlags.IgnoreCase)?.GetValue(obj)?.ToString();
-                result = result.Replace(propertyTemplate, propertyValue);
-            }
+            var propertyTemplate = TemplateRegexes.PropertyTemplateRegex.Match(result).Value;
+            var propertyName = propertyTemplate[2..^1];
+            var propertyValue = obj.GetType().GetProperty(propertyName,
+                BindingFlags.Instance | BindingFlags.Public | BindingFlags.IgnoreCase)?.GetValue(obj)?.ToString();
+            result = result.Replace(propertyTemplate, propertyValue);
         }
         catch (Exception ex) { Console.WriteLine(ex.Message); }
 
         return result;
     }
     
-    public static string SubstituteIfConstruction(this string template, object? obj)
+    private static string SubstituteIfConstruction(this string template, object obj)
     {
-        if (obj is null) throw new NullReferenceException();
-        
         var result = template;
         try
         {
@@ -63,7 +58,7 @@ static class TemplateStringExtension
                 .GetProperty(propertyName, BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase)?.GetValue(obj);
             
             var comparer = TemplateRegexes.BoolExpressionDictionary.Keys.Where(x => ifTemplate.Contains(x)).Max() ?? "";
-            var compareItem2 = double.Parse(new Regex(@"\d*").Matches(ifTemplate).Where(x => x.Value != "").FirstOrDefault()?.Value!);
+            var compareItem2 = double.Parse(new Regex(@"\d*").Matches(ifTemplate).FirstOrDefault(x => x.Value != "")?.Value!);
 
             var ifExpressionResult = TemplateRegexes.BoolExpressionDictionary[comparer](compareItem1, compareItem2);
 
@@ -75,10 +70,8 @@ static class TemplateStringExtension
         return result;
     }
 
-    public static string SubstituteForConstruction(this string template, object? obj)
+    private static string SubstituteForConstruction(this string template, object obj)
     {
-        if (obj is null) throw new NullReferenceException();
-
         var result = template;
         try
         {
