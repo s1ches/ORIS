@@ -101,7 +101,7 @@ public class MyDataContext : IDataBaseOperations
         return ExecuteNonQueryCommand(command, "Delete");
     }
     
-    public List<T> Select<T>(T? obj)
+    public List<T> Select<T>()
     {
         var tableName = typeof(T).Name;
         var npsqlExpression = String.Format("SELECT * FROM {0}", tableName);

@@ -7,7 +7,7 @@ class Program
     static void Main()
     {
         var db = new MyDataContext(Settings.GetAppSettings().ConnectionString);
-
+        
         var client = new Clients()
         {
             id = 2,
@@ -19,16 +19,14 @@ class Program
             isanonymous = false,
             isblocked = false
         };
-        
-        
 
-        //db.Add<Clients>(client);
+        //db.Add(client);
 
         //db.Delete<Clients>(6);
 
         //Console.WriteLine(db.SelectById<Clients>(2)?.fullname);
 
-        //db.Update<Clients>(client);
+        //db.Update(client);
 
         //Console.WriteLine(db.SelectById<Clients>(2)?.fullname);
     }
