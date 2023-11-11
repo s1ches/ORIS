@@ -1,7 +1,9 @@
 using HtmlAgilityPack;
+using MyHTTPServer.attributes;
+using MyHTTPServer.handlers;
 using MyHTTPServer.model;
 
-namespace MyHTTPServer.handlers;
+namespace MyHTTPServer.controllers;
 
 [HttpController("OrdersController")]
 public class Orders
@@ -26,7 +28,7 @@ public class Orders
                 cardsCount -= 10;
             }
         }
-        catch (Exception ex) { }
+        catch (Exception ex) { Console.WriteLine(ex.Message); }
 
         return steamCards;
     }

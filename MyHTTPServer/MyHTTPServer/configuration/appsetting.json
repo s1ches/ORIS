@@ -6,5 +6,6 @@
   "EmailSender": "s1chess@yandex.ru",
   "PasswordSender": "oxtejzeqmktbxfcj",
   "SMTPServerHost": "smtp.yandex.ru",
-  "SMTPServerPort": 465
+  "SMTPServerPort": 465,
+  "ConnectionString": "Server=localhost;Port=5432;Database=HttpServer;Username=postgres;Password=postgres"
 } 

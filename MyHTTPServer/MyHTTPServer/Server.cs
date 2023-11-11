@@ -1,74 +1,77 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Reflection;
-using System.Reflection.Metadata;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading;
-using System.Threading.Tasks;
+﻿using System.Net;
 using MyHTTPServer.configuration;
 using MyHTTPServer.handlers;
 
 namespace MyHTTPServer
 {
-    public class Server
+    public class Server : IDisposable
     {
-        private HttpListener _listener;
-        private static AppSettingConfig _serverConfig;
-        private static bool _isStop = true; 
-        private CancellationTokenSource _cts;
+        private readonly HttpListener _listener;
+        private readonly CancellationTokenSource _cts;
 
         public Server()
         {
-            _serverConfig = ServerConfig.GetConfig();
+            var serverConfig = ServerConfig.GetConfig();
             _listener = new HttpListener();
-            _listener.Prefixes.Add($"{_serverConfig.Address}:{_serverConfig.Port}/");
+            _listener.Prefixes.Add($"{serverConfig?.Address}:{serverConfig?.Port}/");
             _cts = new CancellationTokenSource();
         }
 
-        public async Task Start()
-        {
-            _isStop = false;
-            var serverListeningTask = Task.Run( async () => await StartServerListening(_cts.Token), _cts.Token);
-            while (!_isStop)
-                _isStop = await IsStop();
-
-            _cts.Cancel();
-            
-            if (_listener.IsListening)
-            {
-                await Console.Out.WriteLineAsync("Сервер остановлен");
-                _listener.Stop();
-            }
-            await Console.Out.WriteLineAsync("Работа сервера завершена");
-        }
-
-        async private Task StartServerListening(CancellationToken _token)
+        public void StartServer()
         {
             if (_listener.Prefixes.Count == 0)
                 throw new ArgumentException("Server has no prefixes");
+            
+            var token = _cts.Token; 
+            Task.Run(() => Listen(token), token);
+            
+            var isStop = false;
+            while (!isStop && !_cts.IsCancellationRequested)
+                if(Console.KeyAvailable)
+                    isStop = IsStop();
+            
+            _cts.Cancel();
+            _cts.Dispose();
+        }
 
+        private void Listen(CancellationToken token)
+        {
             try
-            {  
+            {
                 _listener.Start();
-                await Console.Out.WriteLineAsync("Сервер запущен");
-                
+                Console.WriteLine("Сервер запущен");
+
                 Handler staticFilesHandler = new StaticFilesHandler();
                 Handler controllerHandler = new ControllerHandler();
                 staticFilesHandler.Successor = controllerHandler;
+                
+                var getContextTask = Task.Run(_listener.GetContextAsync, token);
 
-                while (!_token.IsCancellationRequested)
+                while (!token.IsCancellationRequested)
                 {
-                    var context = await _listener.GetContextAsync();
-                    staticFilesHandler.HandleRequest(context);
-                    await Console.Out.WriteLineAsync($"Запрос обработан");
+                    if (!getContextTask.IsCompleted) continue;
+                    
+                    staticFilesHandler.HandleRequest(getContextTask.Result);
+                    Console.WriteLine("Запрос обработан");
+                    getContextTask = Task.Run(_listener.GetContextAsync, token);
                 }
+                
+                token.ThrowIfCancellationRequested();
             }
-            catch (Exception ex) { /*await Console.Out.WriteLineAsync(ex.Message);*/ }
+            catch (Exception ex) { Console.WriteLine(ex.Message); }
+            finally { Dispose(); }
         }
 
-        private async Task<bool> IsStop() =>  Console.ReadLine().ToLower().Equals("stop");
+        private bool IsStop() => 
+            string.Compare(Console.ReadLine(), "stop", StringComparison.OrdinalIgnoreCase) == 0;
+        
+
+        public void Dispose()
+        {
+            _listener.Stop();
+            Console.WriteLine("Сервер остановлен");
+            ((IDisposable)_listener).Dispose();
+            Console.WriteLine("Работа сервера завершена");
+        }
     }
 }

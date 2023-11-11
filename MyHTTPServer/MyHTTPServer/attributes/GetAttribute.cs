@@ -1,4 +1,4 @@
-namespace MyHTTPServer.handlers;
+namespace MyHTTPServer.attributes;
 
 public class GetAttribute : Attribute,IHttpMethodAttribute
 {

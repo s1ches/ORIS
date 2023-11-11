@@ -1,15 +1,14 @@
-using System.Net;
-using System.Text.RegularExpressions;
-using MyHTTPServer.configuration;
+using MyHTTPServer.attributes;
 using MyHTTPServer.model;
+using MyHTTPServer.services;
 
-namespace MyHTTPServer.handlers;
+namespace MyHTTPServer.controllers;
 
 [HttpController("FormController")]
 public class FormController
 {
     [Post("SendForm")]
-    async public void SendForm(string city, string address, string name,
+    public async void SendForm(string city, string address, string name,
         string surname, string birthday, string phoneNumber, string email)
     { 
         await new EmailSenderService().SendEmailAsync(city, address, name, surname, birthday,
@@ -23,15 +22,16 @@ public class FormController
         return htmlCode;
     }
     
-    [Get("SendForm3")]
-    public Account[] SendForm3()
+    [Get("GetAccounts")]
+    [NeedAuh]
+    public Account[] GetAccounts()
     {
         var accounts = new Account[]
         {
-            new Account() { email = "email-1", password = "pass-1" },
-            new Account() { email = "email-2", password = "pass-2" }
+            new() { email = "email-1", password = "pass-1" },
+            new() { email = "email-2", password = "pass-2" }
         };
-
+        
         return accounts;
     }
 }
