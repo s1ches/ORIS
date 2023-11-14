@@ -8,7 +8,7 @@ namespace MyHTTPServer.services;
 public class EmailSenderService : IEmailSenderService
 {
     private static readonly string _pathToZip = @"../../../zip.zip";
-    private static readonly AppSettingConfig? _serverConfig = ServerConfig.GetConfig();
+    private static readonly AppSettingConfig _serverConfig = AppSettingConfig.Instance;
 
     public async Task SendEmailAsync(string city, string address, string name,
         string surname, string birthday, string phoneNumber, string email)
@@ -22,7 +22,7 @@ public class EmailSenderService : IEmailSenderService
     {
         using var emailMessage = new MimeMessage();
         
-        emailMessage.From.Add(new MailboxAddress(_serverConfig?.FromName, _serverConfig?.EmailSender));
+        emailMessage.From.Add(new MailboxAddress(_serverConfig.FromName, _serverConfig.EmailSender));
         emailMessage.To.Add(new MailboxAddress("", toEmail));
 
         emailMessage.Subject = subject;

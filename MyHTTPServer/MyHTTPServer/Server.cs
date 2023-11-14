@@ -11,7 +11,7 @@ namespace MyHTTPServer
 
         public Server()
         {
-            var serverConfig = ServerConfig.GetConfig();
+            var serverConfig = AppSettingConfig.Instance;
             _listener = new HttpListener();
             _listener.Prefixes.Add($"{serverConfig?.Address}:{serverConfig?.Port}/");
             _cts = new CancellationTokenSource();

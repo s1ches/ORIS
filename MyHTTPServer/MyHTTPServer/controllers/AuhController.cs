@@ -10,10 +10,10 @@ public class AuhController
     [Post("Login")]
     public Cookie Login(string login, string password)
     {
-        var config = ServerConfig.GetConfig();
+        var config = AppSettingConfig.Instance;
         return new Cookie("id", GetCustomerId(login, password))
         {
-            Domain = config.Address.Split("//")[1],
+            Domain = config.Address?.Split("//")[1],
             Path = "/",
             Expires = DateTime.Today.AddMonths(1)
         };

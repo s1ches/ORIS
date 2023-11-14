@@ -9,11 +9,11 @@ namespace MyHTTPServer.handlers;
 
 public class ControllerHandler : Handler
 {
-    private static readonly AppSettingConfig? _serverConfig;
+    private static readonly AppSettingConfig _serverConfig;
 
     static ControllerHandler()
     {
-        _serverConfig = ServerConfig.GetConfig();
+        _serverConfig = AppSettingConfig.Instance;
     }
     
     public override async Task HandleRequest(HttpListenerContext context)

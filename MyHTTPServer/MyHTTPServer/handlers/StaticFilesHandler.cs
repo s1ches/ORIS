@@ -6,7 +6,7 @@ namespace MyHTTPServer.handlers;
 
 public class StaticFilesHandler : Handler
 {
-    private static readonly Dictionary<string, string> MimeTypes = new Dictionary<string, string>(){            
+    private static readonly Dictionary<string, string> MimeTypes = new (){            
         {"html", "text/html"},
         {"/",  "text/html"},
         {"css" , "text/css"},
@@ -16,7 +16,12 @@ public class StaticFilesHandler : Handler
         {"ico", "image/x-icon"}
     };
     
-    private static readonly AppSettingConfig? _serverConfig = ServerConfig.GetConfig();
+    private static readonly AppSettingConfig _serverConfig;
+
+    static StaticFilesHandler()
+    {
+        _serverConfig = AppSettingConfig.Instance;
+    }
     
     public override async Task HandleRequest(HttpListenerContext context)
     {
@@ -32,8 +37,8 @@ public class StaticFilesHandler : Handler
         var request = context.Request;
         var requestUrl = string.Join("", request.RawUrl!.Skip(1).ToArray());
             
-        var path = $@"../../../{_serverConfig?.StaticFilesPath}/index.html";
-        var staticFilePath = $@"../../../{_serverConfig?.StaticFilesPath}/{requestUrl}";
+        var path = $@"../../../{_serverConfig.StaticFilesPath}/index.html";
+        var staticFilePath = $@"../../../{_serverConfig.StaticFilesPath}/{requestUrl}";
         var isFind = false;
 
         byte[] responseBuffer;
@@ -41,12 +46,12 @@ public class StaticFilesHandler : Handler
         if ((requestUrl.StartsWith("imgs") || requestUrl.StartsWith("styles") || requestUrl.EndsWith("html")) && File.Exists(staticFilePath))
         {
             isFind = true;
-            responseBuffer = File.ReadAllBytes(staticFilePath);
+            responseBuffer = await File.ReadAllBytesAsync(staticFilePath);
         }
         else if (File.Exists(path))
         {
             isFind = true;
-            responseBuffer = File.ReadAllBytes(path);
+            responseBuffer = await File.ReadAllBytesAsync(path);
         }
         else responseBuffer = Encoding.Default.GetBytes("<h4>404 - Not Found</h4>");
 
