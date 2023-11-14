@@ -18,7 +18,7 @@ namespace MyHTTPServer.configuration
 
         public static AppSettingConfig? GetConfig()
         {
-            if (ConfigInfo == null)
+            if (ConfigInfo is null)
                 new ServerConfig();
 
             return ConfigInfo;

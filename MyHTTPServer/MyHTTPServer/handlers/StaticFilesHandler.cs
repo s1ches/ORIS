@@ -18,10 +18,10 @@ public class StaticFilesHandler : Handler
     
     private static readonly AppSettingConfig? _serverConfig = ServerConfig.GetConfig();
     
-    public override async void HandleRequest(HttpListenerContext context)
+    public override async Task HandleRequest(HttpListenerContext context)
     {
         if (IsStaticFilesRequested(context.Request)) await GiveStaticFileResponse(context);
-        else if(Successor != null) Successor.HandleRequest(context);
+        else if(Successor != null) await Successor.HandleRequest(context);
     }
     
     private static string GetContentType(HttpListenerRequest request) => MimeTypes[request.RawUrl!.Split(".").Last()];

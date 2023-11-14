@@ -16,7 +16,7 @@ public class ControllerHandler : Handler
         _serverConfig = ServerConfig.GetConfig();
     }
     
-    public override async void HandleRequest(HttpListenerContext context)
+    public override async Task HandleRequest(HttpListenerContext context)
     {
         var response = context.Response;
         var request = context.Request;
@@ -53,7 +53,7 @@ public class ControllerHandler : Handler
             responseBuffer = Encoding.UTF8.GetBytes(resultString);
         else if (methodResult is Cookie cookie)
             response.Cookies.Add(cookie);
-        else if (!(methodResult is null))
+        else if (methodResult is not null)
         {
             var serializeObj  = JsonSerializer.Serialize(methodResult);
             responseBuffer = Encoding.UTF8.GetBytes(serializeObj);

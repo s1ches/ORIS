@@ -17,24 +17,27 @@ namespace MyHTTPServer
             _cts = new CancellationTokenSource();
         }
 
-        public void StartServer()
+        public async Task StartServer()
         {
             if (_listener.Prefixes.Count == 0)
                 throw new ArgumentException("Server has no prefixes");
             
             var token = _cts.Token; 
-            Task.Run(() => Listen(token), token);
-            
-            var isStop = false;
-            while (!isStop && !_cts.IsCancellationRequested)
-                if(Console.KeyAvailable)
-                    isStop = IsStop();
+            var listenTask =  Task.Run(async () => await ListenAsync(token), token);
+
+            await Task.Run(() =>
+            {
+                var isStop = false;
+                while (!isStop && !_cts.IsCancellationRequested)
+                    if(Console.KeyAvailable)
+                        isStop = IsStop();
+            }, token);
             
             _cts.Cancel();
-            _cts.Dispose();
+            Task.WaitAny(listenTask);
         }
 
-        private void Listen(CancellationToken token)
+        private async Task ListenAsync(CancellationToken token)
         {
             try
             {
@@ -51,7 +54,7 @@ namespace MyHTTPServer
                 {
                     if (!getContextTask.IsCompleted) continue;
                     
-                    staticFilesHandler.HandleRequest(getContextTask.Result);
+                    await staticFilesHandler.HandleRequest(getContextTask.Result);
                     Console.WriteLine("Запрос обработан");
                     getContextTask = Task.Run(_listener.GetContextAsync, token);
                 }

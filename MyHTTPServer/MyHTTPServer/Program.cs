@@ -1,10 +1,10 @@
 ﻿using MyHTTPServer;
 
-class Program
+internal class Program
 {
-    private static void Main(string[] args)
+    private static async Task Main(string[] args)
     {
         var server = new Server();
-        server.StartServer();
+        await server.StartServer();
     }
 }
