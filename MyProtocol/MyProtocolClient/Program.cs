@@ -3,6 +3,7 @@ using System.Net;
 using MyProtocolServer.Protocol.XPacket;
 using MyProtocolClient;
 using MyProtocolServer.Protocol.XPacketsTypes;
+using System.Text;
 
 namespace TCPClient
 {
@@ -26,8 +27,6 @@ namespace TCPClient
 
             Console.WriteLine("Sending handshake packet..");
            
-            //RegisterTypes();
-
             client.QueuePacketSend(
                 MyProtocolSerializator.Serialize(
                     XPacketType.Handshake,
@@ -37,7 +36,9 @@ namespace TCPClient
                     })
                     .ToPacket());
 
-            while (true) 
+            var name = Console.ReadLine();
+
+            while (true)
             {
                 
             }
@@ -73,11 +74,6 @@ namespace TCPClient
 
             if (_handshakeMagic - handshake.MagicHandshakeNumber == 15)
                 Console.WriteLine("Handshake successful!");
-        }
-
-        private static void RegisterTypes()
-        {
-            XPacketTypeManager.RegisterType(XPacketType.Handshake, 0,0);
         }
     }
 }

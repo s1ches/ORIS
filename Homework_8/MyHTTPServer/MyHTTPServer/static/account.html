@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<h1>AccountPage</h1>
+<form  name="auth-form" class="auth-form" method="post" action="/Account/Add">
+    <input class="input-auth" type="search" name="login" placeholder="email"><br>
+    <input class="input-auth" type="password" name="password" placeholder="password">
+    <button type="submit">Добавить</button>
+</form>
+<br>
+<br>
+<br>
+<form  name="auth-form" class="auth-form" method="post" action="/Account/Delete">
+    <input class="input-auth" type="search" name="id" placeholder="id"><br>
+    <button type="submit">Удалить</button>
+</form>
+<br>
+<br>
+<br>
+<form  name="auth-form" class="auth-form" method="post" action="/Account/Update">
+    <input class="input-auth" type="search" name="id" placeholder="id"><br>
+    <input class="input-auth" type="search" name="email" placeholder="email"><br>
+    <input class="input-auth" type="search" name="password" placeholder="password"><br>
+    <button type="submit">Обновить</button>
+</form>
+<br>
+<br>
+<br>
+</body>
+</html>

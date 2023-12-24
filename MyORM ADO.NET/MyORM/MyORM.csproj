@@ -10,4 +10,8 @@
       <PackageReference Include="Npgsql" Version="8.0.0-rc.2" />
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\..\Homework_9\MyHTTPServer\MyHTTPServer\MyHTTPServer.csproj" />
+    </ItemGroup>
+
 </Project>
