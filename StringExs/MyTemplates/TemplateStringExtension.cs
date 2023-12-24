@@ -80,10 +80,13 @@ public static class TemplateStringExtension
             var forBodyTemplate = fullForTemplate[(forTemplate.Length+4)..^1];
             var forPropertiesTemplate = TemplateRegexes.ForPropertyTemplate.Matches(fullForTemplate).Select(x => x.Value).ToArray();
             var forCollectionTemplate = forTemplate.Split().Last();
+
+            var templateStart = template.Split(fullForTemplate).First();
+            var templateEnd = template.Split(fullForTemplate).Last();
             
             template = template.Replace(fullForTemplate, "");
 
-            var templateBuilder = new StringBuilder(template);
+            var templateBuilder = new StringBuilder(templateStart);
 
             var collection = obj.GetType()
                 .GetProperty(forCollectionTemplate, BindingFlags.Instance | BindingFlags.Public | BindingFlags.IgnoreCase)?
@@ -106,7 +109,8 @@ public static class TemplateStringExtension
 
                 templateBuilder.AppendFormat("{0}\n", forBody);
             }
-            
+
+            templateBuilder.Append(templateEnd);
             result = templateBuilder.ToString();
         }catch(Exception ex) { Console.WriteLine(ex.Message); }
 
